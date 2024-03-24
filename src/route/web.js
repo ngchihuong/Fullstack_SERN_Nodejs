@@ -10,7 +10,8 @@ let initWebRoutes = (app) => {
 
     //post api
     router.post("/post-crud", homeController.postCRUD)
-
+    //display getCRUD
+    router.get("/get-crud", homeController.displayGetCRUD);
     //res api
     router.get("/thu", (req, res) => {
         return res.send("Phung Minh Thu");
