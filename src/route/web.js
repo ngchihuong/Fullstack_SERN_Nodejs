@@ -1,5 +1,6 @@
 import express from "express";
-import homeController  from "../controller/homeController";
+import homeController from "../controller/homeController";
+import userController from "../controller/userController";
 
 let router = express.Router();
 
@@ -22,6 +23,9 @@ let initWebRoutes = (app) => {
     router.get("/thu", (req, res) => {
         return res.send("Phung Minh Thu");
     });
+
+    //API
+    router.post("/api/login", userController.handleLogin)
 
     return app.use("/", router)
 }
