@@ -11,28 +11,28 @@ let handleUserLogin = async (email, password) => {
             if (isExist) {
                 //user already exitst
                 let user = await db.User.findOne({
-                    where : {email : email},
-                    attributes: ['email','roleId', 'password'],
-                    raw : true,
-                        // exclude: ['password'],
+                    where: { email: email },
+                    attributes: ['email', 'roleId', 'password'],
+                    raw: true,
+                    // exclude: ['password'],
 
                 })
                 if (user) {
-                //compare password
-                   let check = bcrypt.compareSync(password, user.password); //false
-                   if (check) {
-                    userData.errorCode = 0,
-                    userData.errMessage = 'OK';
+                    //compare password
+                    let check = bcrypt.compareSync(password, user.password); //false
+                    if (check) {
+                        userData.errorCode = 0,
+                            userData.errMessage = 'OK';
 
-                    delete user.password
-                    userData.user = user
-                   }else {
-                    userData.errorCode = 3;
-                    userData.errMessage = 'Wrong password';
-                   }
-                }else {
+                        delete user.password
+                        userData.user = user
+                    } else {
+                        userData.errorCode = 3;
+                        userData.errMessage = 'Wrong password';
+                    }
+                } else {
                     userData.errorCode = 2,
-                    userData.errMessage = "User's not found!"
+                        userData.errMessage = "User's not found!"
                 }
             } else {
                 // return (error)
@@ -61,6 +61,32 @@ let checkUserEmail = (userEmail) => {
         }
     })
 }
+let getAllUser = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let users = ''
+            if (userId === 'All') {
+                users = await db.User.findAll({
+                    attributes: {
+                        exclude: ['password']
+                    },
+                })
+            }
+            if (userId && userId !== 'All') {
+                users = await db.User.findOne({
+                    where: { id: userId },
+                    attributes: {
+                        exclude: ['password']
+                    }
+                })
+            }
+            resolve(users)
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 module.exports = {
-    handleUserLogin: handleUserLogin
+    handleUserLogin: handleUserLogin,
+    getAllUser: getAllUser
 }
