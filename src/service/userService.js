@@ -96,24 +96,26 @@ let createNewUser = (data) => {
             if (check) {
                 resolve({
                     errCode: 1,
-                    messgae: "Your email is already in used, Plz try another email!"
+                    errMessage: "Your email is already in used, Plz try another email!"
+                })
+            } else {
+                let hashPasswordFromBcrypt = await hashUserPassword(data.password);
+                await db.User.create({
+                    email: data.email,
+                    password: hashPasswordFromBcrypt,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    address: data.address,
+                    phonenumber: data.phonenumber,
+                    gender: data.gender === '1' ? true : false,
+                    roleId: data.roleId,
+                })
+                resolve({
+                    errCode: 0,
+                    messgae: 'OK'
                 })
             }
-            let hashPasswordFromBcrypt = await hashUserPassword(data.password);
-            await db.User.create({
-                email: data.email,
-                password: hashPasswordFromBcrypt,
-                firstName: data.firstName,
-                lastName: data.lastName,
-                address: data.address,
-                phonenumber: data.phonenumber,
-                gender: data.gender === '1' ? true : false,
-                roleId: data.roleId,
-            })
-            resolve({
-                errCode: 0,
-                messgae: 'OK'
-            })
+
         } catch (error) {
             reject(error)
         }
@@ -141,7 +143,7 @@ let deleteUser = (userId) => {
             })
         }
         await db.User.destroy({
-            where: {id: userId}
+            where: { id: userId }
         })
         resolve({
             errCode: 0,
@@ -151,22 +153,22 @@ let deleteUser = (userId) => {
     })
 }
 let updateUserData = (data) => {
-    return new Promise(async(resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         try {
             if (!data.id) {
                 resolve({
-                    errCode: 2, 
+                    errCode: 2,
                     errMessage: 'Missing required parameters!'
                 })
             }
             let user = await db.User.findOne({
-                where: {id: data.id},
-                raw : false
+                where: { id: data.id },
+                raw: false
             })
             if (user) {
                 user.firstName = data.firstName,
-                user.lastName = data.lastName,
-                user.address = data.address
+                    user.lastName = data.lastName,
+                    user.address = data.address
 
                 await user.save()
 
@@ -179,7 +181,7 @@ let updateUserData = (data) => {
                     errCode: 0,
                     messgae: "Update the use success!"
                 })
-            }else {
+            } else {
                 resolve({
                     errCode: 1,
                     messgae: 'User not found!'
@@ -190,10 +192,34 @@ let updateUserData = (data) => {
         }
     })
 }
+let getAllCodeService = (typeInput) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!typeInput) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter!'
+                })
+            } else {
+                let res = {};
+                let allcode = await db.Allcode.findAll({
+                    where: { type: typeInput }
+                });
+                res.errCode = 0;
+                res.data = allcode;
+                resolve(res);
+            }
+
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 module.exports = {
     handleUserLogin: handleUserLogin,
     getAllUser: getAllUser,
     createNewUser: createNewUser,
     deleteUser: deleteUser,
-    updateUserData: updateUserData
+    updateUserData: updateUserData,
+    getAllCodeService: getAllCodeService
 }
