@@ -18,7 +18,7 @@ let initWebRoutes = (app) => {
     router.get("/edit-crud", homeController.getEditCRUD)
     //put /put-crud.....-> post
     router.post("/put-crud", homeController.putCRUD)
-    
+
     //delete
     router.get("/delete-crud", homeController.deleteCRUD);
     //res api
@@ -33,7 +33,7 @@ let initWebRoutes = (app) => {
     router.put('/api/edit-user', userController.handleEditUser)
     router.delete('/api/delete-user', userController.handleDeleteUser)
 
-    router.get('/allcode', userController.getAllCode)
+    router.get('/api/allcode', userController.getAllCode)
 
     return app.use("/", router)
 }

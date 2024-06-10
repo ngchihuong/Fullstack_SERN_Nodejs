@@ -1,6 +1,7 @@
 'use strict';
 
 const { DataTypes } = require("sequelize");
+const { sequelize } = require("../models");
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -27,7 +28,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       gender: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.STRING
       },
       roleId: {
         type: Sequelize.STRING
