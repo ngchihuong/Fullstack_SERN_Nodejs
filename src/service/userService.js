@@ -110,7 +110,7 @@ let createNewUser = (data) => {
                     gender: data.gender,
                     roleId: data.roleId,
                     positionId: data.positionId,
-
+                    image: data.avatar
                 })
                 resolve({
                     errCode: 0,
@@ -169,13 +169,13 @@ let updateUserData = (data) => {
             })
             if (user) {
                 user.firstName = data.firstName,
-                user.lastName = data.lastName,
-                user.address = data.address,
-                user.roleId = data.roleId,
-                user.positionId = data.positionId
+                    user.lastName = data.lastName,
+                    user.address = data.address,
+                    user.roleId = data.roleId,
+                    user.positionId = data.positionId
                 user.gender = data.gender
                 user.phonenumber = data.phonenumber
-
+                user.image = data.avatar
                 await user.save()
 
                 // await db.User.save({
@@ -215,7 +215,6 @@ let getAllCodeService = (typeInput) => {
                 res.data = allcode;
                 resolve(res);
             }
-
         } catch (error) {
             reject(error)
         }
