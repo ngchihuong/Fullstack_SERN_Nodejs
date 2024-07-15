@@ -1,5 +1,6 @@
 import { where } from "sequelize"
 import db from "../models/index"
+import { raw } from "body-parser"
 let getTopDoctorHome = (limitInput) => {
     return new Promise(async (resolve, reject) => {
         try {
@@ -30,12 +31,12 @@ let getAllDoctors = () => {
     return new Promise(async (resolve, reject) => {
         try {
             let doctors = await db.User.findAll({
-                where: {roleId:'R2'},
+                where: { roleId: 'R2' },
                 attributes: {
                     exclude: ['password', 'image']
                 },
             }
-        )
+            )
             resolve({
                 errCode: 0,
                 data: doctors
@@ -53,7 +54,7 @@ let saveDetailInforDoctor = (inputData) => {
                     errCode: 1,
                     errMessage: "Missing parameter!"
                 })
-            }else {
+            } else {
                 await db.Markdown.create({
                     contentHTML: inputData.contentHTML,
                     contentMarkdown: inputData.contentMarkdown,
@@ -70,8 +71,49 @@ let saveDetailInforDoctor = (inputData) => {
         }
     })
 }
+let getDetailDoctorByIdService = (inputId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!inputId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing required parameter!"
+                })
+            } else {
+                let data = await db.User.findOne({
+                    where: {
+                        id: inputId
+                    },
+                    attributes: {
+                        exclude: ['password', 'image']
+                    },
+                    include: [
+                        {
+                            model: db.Markdown,
+                            attributes: ['description',  'contentHTML', 'contentMarkdown']
+                        },
+                        {
+                            model: db.Allcode, as: 'positionData',
+                            attributes: ['valueEn', 'valueVi']
+                        }
+                    ],
+                    raw: true,
+                    nest: true
+                })
+
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 module.exports = {
     getTopDoctorHome: getTopDoctorHome,
     getAllDoctors: getAllDoctors,
-    saveDetailInforDoctor: saveDetailInforDoctor
+    saveDetailInforDoctor: saveDetailInforDoctor,
+    getDetailDoctorByIdService: getDetailDoctorByIdService
 }
