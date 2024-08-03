@@ -1,3 +1,4 @@
+import { raw } from "body-parser";
 import db from "../models/index"
 require('dotenv').config();
 import _ from 'lodash'
@@ -154,24 +155,17 @@ let bulkCreateSchedule = (data) => {
                     {
                         where: { doctorId: data.doctorId, date: data.formatedDate },
                         attributes: ['timeType', 'date', 'doctorId', 'maxNumber'],
-                        raw: true
+                        raw: true,
                     }
                 );
-                //convert date
-                if (existing && existing.length > 0) {
-                    existing = existing.map(item => {
-                        item.date = new Date(item.date).getTime();
-                        return item;
-                    })
-                }
+
                 //compare diffrent
                 let toCreate = _.differenceWith(schedule, existing, (a, b) => {
-                    return a.timeType === b.timeType && a.date === b.date;
+                    return a.timeType === b.timeType && +a.date === +b.date;
                 });
                 if (toCreate && toCreate.length > 0) {
                     await db.Schedule.bulkCreate(toCreate);
                 }
-                console.log("============\n", toCreate);
 
                 resolve({
                     errCode: 0,
@@ -197,7 +191,12 @@ let getScheduleDoctorByDate = (doctorId, date) => {
                     where: {
                         doctorId: doctorId,
                         date: date
-                    }
+                    },
+                    include: [
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                    ],
+                    raw: false,
+                    nest: true,
                 })
                 if (!dataSchedule) {
                     dataSchedule = []
