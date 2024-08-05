@@ -1,8 +1,6 @@
-import { raw } from "body-parser";
 import db from "../models/index"
 require('dotenv').config();
-import _ from 'lodash'
-
+import _ from "lodash";
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
 let getTopDoctorHome = (limitInput) => {
@@ -53,13 +51,17 @@ let getAllDoctors = () => {
 let saveDetailInforDoctor = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
+
             if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown ||
-                !inputData.actions) {
+                !inputData.actions || !inputData.selectedPrice || !inputData.selectedPayment ||
+                !inputData.selectedProvince || !inputData.nameClinic || !inputData.addressClinic ||
+                !inputData.note) {
                 resolve({
                     errCode: 1,
                     errMessage: "Missing parameter!"
                 })
             } else {
+                //upsert to markdown
                 if (inputData.actions === 'CREATE') {
                     await db.Markdown.create({
                         contentHTML: inputData.contentHTML,
@@ -79,14 +81,42 @@ let saveDetailInforDoctor = (inputData) => {
                         await doctorMarkdown.save();
                     }
                 }
-
+                //upsert to doctor infor
+                let doctorInfor = await db.Doctor_Infor.findOne({
+                    where: {
+                        doctorId: inputData.doctorId,
+                    },
+                    raw: false
+                })
+                if (doctorInfor) {
+                    //update
+                    doctorInfor.doctorId = inputData.doctorId;
+                    doctorInfor.priceId = inputData.selectedPrice;
+                    doctorInfor.provinceId = inputData.selectedProvince;
+                    doctorInfor.paymentId = inputData.selectedPayment;
+                    doctorInfor.nameClinic = inputData.nameClinic;
+                    doctorInfor.addressClinic = inputData.addressClinic;
+                    doctorInfor.note = inputData.note;
+                    await doctorInfor.save();
+                } else {
+                    //create
+                    await db.Doctor_Infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        nameClinic: inputData.nameClinic,
+                        addressClinic: inputData.addressClinic,
+                        note: inputData.note,
+                    })
+                }
                 resolve({
                     errCode: 0,
                     errMessage: 'Save infor doctor success!'
                 })
             }
         } catch (error) {
-            reject(e)
+            reject(error)
         }
     })
 }
