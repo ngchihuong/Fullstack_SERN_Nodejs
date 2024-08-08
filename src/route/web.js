@@ -24,7 +24,7 @@ let initWebRoutes = (app) => {
     router.get("/delete-crud", homeController.deleteCRUD);
     //res api
     router.get("/thu", (req, res) => {
-        return res.send("Phung Minh Thu");
+        return res.send("Phung Minh Thu xinh dep!");
     });
 
     //API
@@ -42,6 +42,7 @@ let initWebRoutes = (app) => {
     router.get('/api/get-detail-doctor-by-id', doctorController.getDetailDoctorById)
     router.post('/api/bulk-create-schedule', doctorController.bulkCreateSchedule)
     router.get('/api/get-schedule-doctor-by-date', doctorController.getScheduleDoctorByDate)
+    router.get('/api/get-extra-doctor-infor-by-id', doctorController.getExtraDoctorInforById)
 
     return app.use("/", router)
 }
